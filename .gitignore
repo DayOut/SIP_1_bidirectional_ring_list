@@ -1,0 +1,11 @@
+.vs/
+Debug/
+ipch/
+bin/
+ipch/
+SIP_1.VC.db
+SIP_1.VC.VC.opendb
+Release/
+.vcxproj
+.vcxproj.filters
+
