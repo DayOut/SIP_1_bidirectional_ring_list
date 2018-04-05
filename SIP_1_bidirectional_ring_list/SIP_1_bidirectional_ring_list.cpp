@@ -46,8 +46,6 @@ public:
         }
     }
 
-
-
     void addToEnd(T value)
     {
         TElem< T > *tmp = new TElem < T >;
@@ -114,7 +112,49 @@ public:
         }
     }
 
+    void deleteElement(T value)
+    {
+        if (head)
+        {
+            TElem< T > *cursor = head;
+            do
+            {
+                if (cursor->inf == value)
+                {
+                    cursor->prev->next = cursor->next;
+                    cursor->next = cursor->prev;
+                    delete cursor;
+                    break;
+                }
+                cursor = cursor->next;
+            } while (cursor != head);
+        }
+    }
 
+    void findElement(T value)
+    {
+        bool findFlag = false;
+
+        TElem<T> *cursor = head;
+        do
+        {
+            if (cursor->inf == value)
+            {
+                findFlag = true;
+                break;
+            }
+            cursor = cursor->next;
+        } while (cursor != head);
+
+        if (findFlag == true)
+        {
+            cout << "Ёлемент " << value <<" есть в списке. \n";
+        }
+        else
+        {
+            cout << "Ёлемент " << value << " отсутствует в списке. \n";
+        }
+    }
 
 private:
 
@@ -133,15 +173,21 @@ int main()
     }
 
     
-    list.addToBegin(0);
+    list.addToBegin(2);
 
     list.show();
 
     list.addSorted(9);
     list.addSorted(8);
 
+    list.deleteElement(0);
+    
     //list.addToEnd()
     list.show();
+
+    list.findElement(4);
+    list.findElement(11);
+
 
     return 0;
 }
