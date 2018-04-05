@@ -14,7 +14,7 @@ private:
     template<typename T>
     struct TElem
     {
-        T		      inf;
+        T             inf;
 		TElem< T >    *next;
         TElem< T >    *prev;
     };
@@ -34,13 +34,19 @@ public:
 
     void show()
     {
-        TElem<T> *cursor = head;
-        do
+        if (head)
         {
-            cout << cursor->inf << "\t";
-            cursor = cursor->next;
-        } while (cursor != head);
+            TElem<T> *cursor = head;
+            do
+            {
+                cout << cursor->inf << "\t";
+                cursor = cursor->next;
+            } while (cursor != head);
+            cout << endl;
+        }
     }
+
+
 
     void addToEnd(T value)
     {
@@ -82,8 +88,33 @@ public:
 
     void addSorted(T value)
     {
+        if (head)
+        {
+            TElem< T > *tmp = new TElem< T >;
+            tmp->inf = value;
 
+            TElem< T > *cursor = head;
+            do
+            {
+                if (cursor->inf >= value)
+                {
+                    break;
+                }
+                cursor = cursor->next;
+            } while (cursor != head);
+
+            tmp->next = cursor;
+            tmp->prev = cursor->prev;
+            cursor->prev->next = tmp;
+            cursor->prev = tmp;
+        }
+        else
+        {
+            addToBegin(value);
+        }
     }
+
+
 
 private:
 
@@ -96,14 +127,18 @@ int main()
 
     List<int> list;
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 7; i++)
     {
         list.addToEnd(i);
     }
 
-    list.addToBegin(11);
-    list.addToBegin(12);
-    list.addToBegin(13);
+    
+    list.addToBegin(0);
+
+    list.show();
+
+    list.addSorted(9);
+    list.addSorted(8);
 
     //list.addToEnd()
     list.show();
