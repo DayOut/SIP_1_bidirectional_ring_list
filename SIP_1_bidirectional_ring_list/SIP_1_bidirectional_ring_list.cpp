@@ -169,6 +169,23 @@ public:
 
     void sort()
     {
+
+        /*
+            it may helps: 
+                https://ide.geeksforgeeks.org/GWuAsj
+                https://ideone.com/EdBruH
+                https://github.com/ashishnith09/DSAlgosinC/blob/master/LinkedList/MergeSort%20On%20DLL%20by%20passing%20variable%20by%20refrences
+                https://www.geeksforgeeks.org/merge-sort-for-doubly-linked-list/
+                https://stackoverflow.com/questions/26684481/linked-list-merge-sort
+
+                MergeSort on Doubly Linked List
+                http://www.cplusplus.com/forum/beginner/199976/
+                https://stackoverflow.com/questions/47170967/merge-sort-on-a-doubly-linked-list-c
+                https://www.google.com.ua/search?ei=XRzJWt2kArOTmwXU9KbIDw&q=mergesort+double+list+c%2B%2B&oq=mergesort+double+list+c%2B%2B&gs_l=psy-ab.3...4216612.4217431.0.4227108.6.6.0.0.0.0.158.397.0j3.3.0....0...1c.1.64.psy-ab..3.0.0....0.Jws_DfvwYAA
+
+        */
+
+
         head->prev->next = NULL;
         head->prev = NULL;
 
@@ -219,7 +236,6 @@ public:
     // Function to do merge sort
     TElem< T >* mergeSort(TElem< T >*head)
     {
-        cout << "MergeSort called! \n";
         if (!head || !head->next)
         {
             return head;
@@ -259,7 +275,7 @@ int main()
 
     List<int> list;
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 1000000; i++)
     {
         list.addToEnd(rand() % 100);
     }
@@ -267,7 +283,7 @@ int main()
     
     list.addToBegin(2);
 
-    list.show();
+    //list.show();
 
     /*
     list.addSorted(9);
@@ -281,8 +297,12 @@ int main()
     list.findElement(4);
     list.findElement(11);
 
+    unsigned int start = clock();
+    
     list.sort();
-    list.show();
+    unsigned int end = clock();
+    cout << "ВРемени на сортировку: " << end - start << " ms\n";
+    //list.show();
 
 
 
