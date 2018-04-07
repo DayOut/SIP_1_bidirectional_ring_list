@@ -19,17 +19,17 @@ private:
         TElem< T >    *prev;
     };
 
-    TElem<T> *head, *current, *tail;
+    TElem<T> *head, *current;
 
 public:
     List()
     {
-        head = current = tail = NULL;
+        head = current = NULL;
     }
 
     ~List()
     {
-
+        deleteAllElements();
     }
 
     void show()
@@ -156,6 +156,98 @@ public:
         }
     }
 
+    void deleteAllElements()
+    {
+        head->prev->next = NULL;
+        do
+        {
+            current = head;
+            head = head->next;
+            delete current;           
+        } while (head);
+    }
+
+    void sort()
+    {
+        head->prev->next = NULL;
+        head->prev = NULL;
+
+        mergeSort(head);
+        cout << "sort finished\n";
+
+        current = head;
+        do
+        {
+            if (current->next == NULL)
+            {
+                current->next = head;
+                head->prev = current;
+            }
+            current = current->next;
+        } while (current->next != head);
+
+    }
+  
+    // Function to merge two linked lists
+    TElem< T >* merge(TElem< T >* first, TElem< T >* second)
+    {
+        // If first linked list is empty
+        if (!first)
+            return second;
+
+        // If second linked list is empty
+        if (!second)
+            return first;
+
+        // Pick the smaller value
+        if (first->inf < second->inf)
+        {
+            first->next = merge(first->next, second);
+            first->next->prev = first;
+            first->prev = NULL;
+            return first;
+        }
+        else
+        {
+            second->next = merge(first, second->next);
+            second->next->prev = second;
+            second->prev = NULL;
+            return second;
+        }
+    }
+
+    // Function to do merge sort
+    TElem< T >* mergeSort(TElem< T >*head)
+    {
+        cout << "MergeSort called! \n";
+        if (!head || !head->next)
+        {
+            return head;
+        }
+        TElem< T >* second = split(head);
+
+        // Recur for left and right halves
+        head = mergeSort(head);
+        second = mergeSort(second);
+
+        // Merge the two sorted halves
+        return merge(head, second);
+    }
+
+    TElem< T >* split(TElem< T >* head)
+    {
+        TElem< T >* fast = head, *slow = head;
+        while (fast->next && fast->next->next)
+        {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        TElem< T >* temp = slow->next;
+        slow->next = NULL;
+        return temp;
+    }
+
+
 private:
 
 };
@@ -169,7 +261,7 @@ int main()
 
     for (int i = 0; i < 7; i++)
     {
-        list.addToEnd(i);
+        list.addToEnd(rand() % 100);
     }
 
     
@@ -177,16 +269,22 @@ int main()
 
     list.show();
 
+    /*
     list.addSorted(9);
-    list.addSorted(8);
+    list.addSorted(8);*/
 
     list.deleteElement(0);
     
     //list.addToEnd()
-    list.show();
+    //list.show();
 
     list.findElement(4);
     list.findElement(11);
+
+    list.sort();
+    list.show();
+
+
 
 
     return 0;
