@@ -263,7 +263,46 @@ public:
         return temp;
     }
 
+    bool operator!()
+    {
+        //если у нас есть голова -> есть список, значит возвращаем true
+        return (head) ? true : false;
+        //если выглядит слишком стремно, можешь использовать следующий аналог
+        /*
 
+        if(head != NULL)
+        {
+            return true;
+        }
+
+        return false;
+
+        */
+    }
+
+    void operator ++()
+    {
+        if (current) // если элемент current вообще определен
+        {
+            current = current->next;
+        }
+        else
+        {
+            current = head; // если current не был объявлен до сих пор - присваиваем ему значение первого элемента в списке
+        }
+    }
+
+    void operator --()
+    {
+        if (current) // если элемент current вообще определен
+        {
+            current = current->prev;
+        }
+        else
+        {
+            current = head; // если current не был объявлен до сих пор - присваиваем ему значение первого элемента в списке
+        }
+    }
 private:
 
 };
