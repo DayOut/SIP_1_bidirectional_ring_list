@@ -46,6 +46,20 @@ public:
         }
     }
 
+    void showReverse()
+    {
+        if (head)
+        {
+            TElem<T> *cursor = head->prev; //перешли в конец
+            do
+            {
+                cout << cursor->inf << "\t";
+                cursor = cursor->prev;
+            } while (cursor != head->prev);
+            cout << endl;
+        }
+    }
+
     void addToEnd(T value)
     {
         TElem< T > *tmp = new TElem < T >;
@@ -185,14 +199,15 @@ public:
 
         */
 
-
+        //разрываем кольцевую связь
         head->prev->next = NULL;
         head->prev = NULL;
 
-        mergeSort(head);
-        cout << "sort finished\n";
+        mergeSort(&head);
 
-        current = head;
+        current = head->next;
+        TElem< T > *tmp = head;
+        //выстраиваем обратную связь и заодно закольцовываем список
         do
         {
             if (current->next == NULL)
@@ -200,11 +215,88 @@ public:
                 current->next = head;
                 head->prev = current;
             }
+            current->prev = tmp;
+            tmp = tmp->next;
             current = current->next;
         } while (current->next != head);
+        
+    }
+
+
+    void mergeSort(struct TElem< T > **root)
+    {
+        struct TElem< T > *list1, *list2;
+        struct TElem< T > *headPtr1 = *root;
+
+        if ((headPtr1 == NULL) || (headPtr1->next == NULL))
+        {
+            return;
+        }
+
+        findMid(headPtr1, &list1, &list2);
+
+        mergeSort(&list1);
+        mergeSort(&list2);
+
+        *root = mergeList(list1, list2);
 
     }
-  
+
+    typename TElem< T >* mergeList(struct TElem< T > *list1, struct TElem< T > *list2)
+    {
+        struct TElem< T > tempheadPtr = { 0, NULL }, *tail = &tempheadPtr;
+
+        while ((list1 != NULL) && (list2 != NULL))
+        {
+            TElem< T > **min = (list1->inf < list2->inf) ? &list1 : &list2;
+            TElem< T > *next = (*min)->next;
+            tail = tail->next = *min;
+            *min = next;
+        }
+        tail->next = list1 ? list1 : list2;
+        return tempheadPtr.next;
+    }
+
+    void findMid(TElem< T > *root, TElem< T > **list1, TElem< T > **list2)
+    {
+        /**
+        * Возвращает указатель на элемент структуры TElem< T > рядом с серединой списка
+        * и после обрезаем оригинальный список перед этим элементом
+        */
+        struct TElem< T > *slow, *fast;
+
+        if ((root == NULL) || (root->next == NULL))
+        {
+            *list1 = root;
+            *list2 = NULL;
+            return;
+        }
+        else
+        {
+            /*
+            два курсора, fast движется в 2 раза быстрее slow, на одну итерацию slow происходит 2 итерации fast
+            за счет этого находится середина списка (когда fast == NULL, slow будет ровно в центре списка)
+            */
+            slow = root;
+            fast = root->next;
+            while (fast != NULL)
+            {
+                fast = fast->next;
+                if (fast != NULL)
+                {
+                    slow = slow->next;
+                    fast = fast->next;
+                }
+            }
+
+            *list1 = root;
+            *list2 = slow->next;
+            slow->next = NULL;
+        }
+    }
+
+
+  /*
     // Function to merge two linked lists
     TElem< T >* merge(TElem< T >* first, TElem< T >* second)
     {
@@ -261,7 +353,7 @@ public:
         TElem< T >* temp = slow->next;
         slow->next = NULL;
         return temp;
-    }
+    }*/
 
     bool operator!()
     {
@@ -316,7 +408,7 @@ int main()
 
     for (int i = 0; i < 1000000; i++)
     {
-        list.addToEnd(rand() % 100);
+        list.addToEnd(rand() % 100000);
     }
 
     
@@ -335,6 +427,7 @@ int main()
 
     list.findElement(4);
     list.findElement(11);
+    //list.show();
 
     unsigned int start = clock();
     
@@ -342,7 +435,9 @@ int main()
     unsigned int end = clock();
     cout << "ВРемени на сортировку: " << end - start << " ms\n";
     //list.show();
-
+    cout << endl;
+    //list.showReverse();
+    system("pause");
 
 
 
