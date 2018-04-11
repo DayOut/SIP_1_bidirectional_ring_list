@@ -31,6 +31,11 @@ public:
     {
         deleteAllElements();
     }
+    
+    bool isEmpty()
+    {
+        return (head) ? true : false;
+    }
 
     void show()
     {
@@ -172,13 +177,17 @@ public:
 
     void deleteAllElements()
     {
-        head->prev->next = NULL;
-        do
+        if (head)
         {
-            current = head;
-            head = head->next;
-            delete current;           
-        } while (head);
+            head->prev->next = NULL;
+            do
+            {
+                current = head;
+                head = head->next;
+                delete current;
+            } while (head);
+        }
+        
     }
 
     void sort()
@@ -203,6 +212,7 @@ public:
         head->prev->next = NULL;
         head->prev = NULL;
 
+        //сортируем как линейный односв€зный список
         mergeSort(&head);
 
         current = head->next;
@@ -222,11 +232,10 @@ public:
         
     }
 
-
-    void mergeSort(struct TElem< T > **root)
+    void mergeSort(TElem< T > **root)
     {
-        struct TElem< T > *list1, *list2;
-        struct TElem< T > *headPtr1 = *root;
+        TElem< T > *list1, *list2;
+        TElem< T > *headPtr1 = *root;
 
         if ((headPtr1 == NULL) || (headPtr1->next == NULL))
         {
@@ -242,9 +251,9 @@ public:
 
     }
 
-    typename TElem< T >* mergeList(struct TElem< T > *list1, struct TElem< T > *list2)
+    typename TElem< T >* mergeList(TElem< T > *list1, TElem< T > *list2)
     {
-        struct TElem< T > tempheadPtr = { 0, NULL }, *tail = &tempheadPtr;
+        TElem< T > tempheadPtr = { 0, NULL }, *tail = &tempheadPtr;
 
         while ((list1 != NULL) && (list2 != NULL))
         {
@@ -295,66 +304,6 @@ public:
         }
     }
 
-
-  /*
-    // Function to merge two linked lists
-    TElem< T >* merge(TElem< T >* first, TElem< T >* second)
-    {
-        // If first linked list is empty
-        if (!first)
-            return second;
-
-        // If second linked list is empty
-        if (!second)
-            return first;
-
-        // Pick the smaller value
-        if (first->inf < second->inf)
-        {
-            first->next = merge(first->next, second);
-            first->next->prev = first;
-            first->prev = NULL;
-            return first;
-        }
-        else
-        {
-            second->next = merge(first, second->next);
-            second->next->prev = second;
-            second->prev = NULL;
-            return second;
-        }
-    }
-
-    // Function to do merge sort
-    TElem< T >* mergeSort(TElem< T >*head)
-    {
-        if (!head || !head->next)
-        {
-            return head;
-        }
-        TElem< T >* second = split(head);
-
-        // Recur for left and right halves
-        head = mergeSort(head);
-        second = mergeSort(second);
-
-        // Merge the two sorted halves
-        return merge(head, second);
-    }
-
-    TElem< T >* split(TElem< T >* head)
-    {
-        TElem< T >* fast = head, *slow = head;
-        while (fast->next && fast->next->next)
-        {
-            fast = fast->next->next;
-            slow = slow->next;
-        }
-        TElem< T >* temp = slow->next;
-        slow->next = NULL;
-        return temp;
-    }*/
-
     bool operator!()
     {
         //если у нас есть голова -> есть список, значит возвращаем true
@@ -395,6 +344,75 @@ public:
             current = head; // если current не был объ€влен до сих пор - присваиваем ему значение первого элемента в списке
         }
     }
+
+    List< T >& operator=(List< T >& right)
+    {
+        // вызыватьс€ будет как
+        // list1 = list2; (list1 - левый, list2 - правый)
+        // следовательно эта функци€ будет вызвана внутри экземпл€ра класса list1 
+
+        if (right.isEmpty())
+        {
+            TElem< T > *rightHead = right.getHead();
+            TElem< T > *rightCurr = rightHead;
+            // TODO: присваивание текущему списку правого
+
+            if (this == &right) //проверка на самоприсваивание 
+            {
+                return *this;
+            }
+
+            if (this) //если список в который записываем не был пустым
+            {
+                deleteAllElements();
+            }
+
+            //создали голову дл€ текущего списка 
+            TElem< T > *leftHead = new TElem< T >;
+            leftHead->inf = rightHead->inf;
+            leftHead->next = NULL;
+            leftHead->prev = NULL;
+
+            //прописали в внутриклассовые переменные 
+            head = leftHead;
+            current = head;
+
+            //переходим к следующему элементу в правом списке
+            if (rightCurr->next)
+            {
+                rightCurr = rightCurr->next;
+            }
+
+            TElem< T >* prevCurr = NULL;
+
+            //проходим по всему остальному списку копиру€ поэлементно 
+            do
+            {
+                // выдел€ем пам€ть под новый элемент и заполн€ем
+                TElem< T > * leftTmp = new TElem< T >;
+                leftTmp->inf = rightCurr->inf;
+                leftTmp->next = NULL;
+                leftTmp->prev = NULL;
+
+                current->next = leftTmp; //помещаем скопированный элеемнт в левый список
+                prevCurr = current;
+                current = current->next;
+                current->prev = prevCurr; // делаем обратную св€зь
+                rightCurr = rightCurr->next;
+            } while (rightCurr != rightHead);
+
+            current->next = head;
+            head->prev = current;
+
+        }
+    }
+
+    TElem< T >* getHead()
+    {
+        return head;
+    }
+
+
 private:
 
 };
@@ -406,19 +424,15 @@ int main()
 
     List<int> list;
 
-    for (int i = 0; i < 1000000; i++)
+    for (int i = 0; i < 7; i++)
     {
-        list.addToEnd(rand() % 100000);
+        list.addToEnd(rand() % 100);
     }
 
     
     list.addToBegin(2);
 
     //list.show();
-
-    /*
-    list.addSorted(9);
-    list.addSorted(8);*/
 
     list.deleteElement(0);
     
@@ -434,13 +448,23 @@ int main()
     list.sort();
     unsigned int end = clock();
     cout << "¬–емени на сортировку: " << end - start << " ms\n";
-    //list.show();
+    list.addSorted(9);
+    list.addSorted(8);
+    list.show();
     cout << endl;
-    //list.showReverse();
+    list.showReverse();
+
+    
+
+    
+
+    List<int> list2;
+    list2 = list;
+    list2.show();
+    cout << endl;
+    list2.showReverse();
+
     system("pause");
-
-
-
     return 0;
 }
 
