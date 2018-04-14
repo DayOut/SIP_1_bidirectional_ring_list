@@ -465,6 +465,23 @@ public:
             current = head;
     }
     
+    T getCopyInf()
+    {
+        if (!current)
+        {
+            current = head;
+        }
+        return current->inf;
+    }
+
+    T& getPointerInf()
+    {
+        if (!current)
+        {
+            current = head;
+        }
+        return current->inf;
+    }
 
 private:
     TElem< T >* getHead()
@@ -484,7 +501,7 @@ int main()
         cout << "asd";
     }
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 5; i++)
     {
         list.addToEnd(rand() % 100);
     }
@@ -536,11 +553,14 @@ int main()
     list2.show();
 
     cout << "------------------ \n list: \n";
-    list.addToBegin(150);
+    list.addToBegin(10);
     list.show();
     list.setCurrentToHead();
     list.sortCurrentElement();
     list.show();
+    cout << endl;
+    int a = list.getCopyInf();
+    cout << "\n" << a << endl;
 
     system("pause");
     return 0;
