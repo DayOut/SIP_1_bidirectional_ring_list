@@ -31,11 +31,6 @@ public:
     {
         deleteAllElements();
     }
-    
-    bool isEmpty()
-    {
-        return (head) ? true : false;
-    }
 
     void show()
     {
@@ -150,29 +145,53 @@ public:
         }
     }
 
-    void findElement(T value)
+    void deleteCurrentElement()
     {
-        bool findFlag = false;
+        TElem< T > *tmp;
+        if (!head)
+        {
+            return;
+        }
+        else if (current == head)
+        {
+            tmp = head;
 
+            if (head->next == head)
+            {
+                head = NULL;
+            }
+            else
+            {
+                head = head->next;
+                head->prev = tmp->prev;
+                tmp->prev->next = head;
+            }
+        }
+        else
+        {
+            tmp = current;
+            current = current->next;
+            current->prev = tmp->prev;
+            tmp->prev->next = current;
+
+        }
+
+        delete tmp;
+    }
+
+    bool findElement(T value)
+    {
         TElem<T> *cursor = head;
         do
         {
             if (cursor->inf == value)
             {
-                findFlag = true;
-                break;
+                return true;
             }
             cursor = cursor->next;
         } while (cursor != head);
 
-        if (findFlag == true)
-        {
-            cout << "Ёлемент " << value <<" есть в списке. \n";
-        }
-        else
-        {
-            cout << "Ёлемент " << value << " отсутствует в списке. \n";
-        }
+        return false;
     }
 
     void deleteAllElements()
@@ -307,22 +326,28 @@ public:
     bool operator!()
     {
         //если у нас есть голова -> есть список, значит возвращаем true
-        return (head) ? true : false;
-        //если выгл€дит слишком стремно, можешь использовать следующий аналог
+        return (head) ? false : true;
+
+        //(условие) ? если_да : если_нет;
         /*
 
         if(head != NULL)
         {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
 
         */
+
+        
     }
 
-    void operator ++()
+    void operator++()
     {
+        if (!head)
+            return;
+
         if (current) // если элемент current вообще определен
         {
             current = current->next;
@@ -331,11 +356,16 @@ public:
         {
             current = head; // если current не был объ€влен до сих пор - присваиваем ему значение первого элемента в списке
         }
+
+        // current = (current) ? current->next : head;
     }
 
     void operator --()
     {
-        if (current) // если элемент current вообще определен
+        if (!head)
+            return;
+
+        if (current != NULL) // если элемент current вообще определен
         {
             current = current->prev;
         }
@@ -343,93 +373,122 @@ public:
         {
             current = head; // если current не был объ€влен до сих пор - присваиваем ему значение первого элемента в списке
         }
+        
+        //current = (current) ? current->prev : head;
     }
 
     List< T >& operator=(List< T >& right)
     {
-        // вызыватьс€ будет как
-        // list1 = list2; (list1 - левый, list2 - правый)
-        // следовательно эта функци€ будет вызвана внутри экземпл€ра класса list1 
-
-        if (right.isEmpty())
+        if (this == &right) //проверка на самоприсваивание 
         {
-            TElem< T > *rightHead = right.getHead();
-            TElem< T > *rightCurr = rightHead;
-            // TODO: присваивание текущему списку правого
-
-            if (this == &right) //проверка на самоприсваивание 
-            {
-                return *this;
-            }
-
-            if (this) //если список в который записываем не был пустым
-            {
-                deleteAllElements();
-            }
-
-            //создали голову дл€ текущего списка 
-            TElem< T > *leftHead = new TElem< T >;
-            leftHead->inf = rightHead->inf;
-            leftHead->next = NULL;
-            leftHead->prev = NULL;
-
-            //прописали в внутриклассовые переменные 
-            head = leftHead;
-            current = head;
-
-            //переходим к следующему элементу в правом списке
-            if (rightCurr->next)
-            {
-                rightCurr = rightCurr->next;
-            }
-
-            TElem< T >* prevCurr = NULL;
-
-            //проходим по всему остальному списку копиру€ поэлементно 
-            do
-            {
-                // выдел€ем пам€ть под новый элемент и заполн€ем
-                TElem< T > * leftTmp = new TElem< T >;
-                leftTmp->inf = rightCurr->inf;
-                leftTmp->next = NULL;
-                leftTmp->prev = NULL;
-
-                current->next = leftTmp; //помещаем скопированный элеемнт в левый список
-                prevCurr = current;
-                current = current->next;
-                current->prev = prevCurr; // делаем обратную св€зь
-                rightCurr = rightCurr->next;
-            } while (rightCurr != rightHead);
-
-            current->next = head;
-            head->prev = current;
-
+            return *this;
         }
+
+        TElem< T > *rightHead = right.getHead();
+        TElem< T > *rightCurrent = rightHead;
+
+        TElem< T > *tmp = head; // курсор в левом списке
+
+        while (tmp || rightCurrent)
+        {
+            if (rightCurrent && tmp)
+            {
+                tmp->inf = rightCurrent->inf;
+            }
+            else if (tmp && !rightCurrent)
+            {
+                current = tmp;
+                tmp = tmp->prev;
+                deleteCurrentElement();
+            }
+            else if (!tmp && rightCurrent)
+            {
+                addToEnd(rightCurrent->inf);
+            }
+
+            if(tmp)
+                tmp = (tmp->next == head) ? NULL : tmp->next;
+            if(rightCurrent)
+                rightCurrent = (rightCurrent->next == rightHead) ? NULL : rightCurrent->next;
+        }
+        
     }
 
+    void sortCurrentElement() 
+    {
+        // проверка на пустой список
+        if (!head)
+        {
+            return;
+        }
+
+        // проверка на наличие "текущего" элемента
+        if (!current)
+        {
+            current = head;
+        }
+        else if (current == head && current->inf <= head->next->inf)
+        {
+            return;
+        }
+        else if (current == head && current->inf > head->next->inf)
+        {
+            head = head->next;
+            head->prev = current->prev;
+            head->prev->next = current->next;
+        }
+
+
+        // если элемент больше следующего - необходимо искать место текущему элементу во второй части списка
+        // иначе до этого места
+        TElem< T > *tmp = head;
+
+        while (current->inf > tmp->inf)
+        {
+            tmp = tmp->next;
+            if (tmp == head)
+            {
+                break;
+            }
+            
+        }
+
+        current->next = tmp->prev->next;
+        current->prev = tmp->prev;
+        tmp->prev->next = current;
+        tmp->prev = current;
+    }
+
+    void setCurrentToHead()
+    {
+        if (head)
+            current = head;
+    }
+    
+
+private:
     TElem< T >* getHead()
     {
         return head;
     }
-
-
-private:
-
 };
 
 int main()
 {
     setlocale(LC_ALL, "rus");
     srand(time(NULL));
-
+    
     List<int> list;
+    if (!list)
+    {
+        cout << "asd";
+    }
 
     for (int i = 0; i < 7; i++)
     {
         list.addToEnd(rand() % 100);
     }
 
-    
     list.addToBegin(2);
 
     //list.show();
@@ -454,15 +513,34 @@ int main()
     cout << endl;
     list.showReverse();
 
-    
-
-    
-
     List<int> list2;
+    cout << "list2: \n";
     list2 = list;
+    list.deleteCurrentElement();
+
     list2.show();
     cout << endl;
     list2.showReverse();
+    
+    cout << "------------------ \n list: \n";
+    list.show();
+    cout << "list2:" << endl;
+    list2 = list;
+    list2.show();
+
+    cout << "------------------ \n list: \n";
+    list.addToEnd(59);
+    list.show();
+    cout << "list2:" << endl;
+    list2 = list;
+    list2.show();
+
+    cout << "------------------ \n list: \n";
+    list.addToBegin(150);
+    list.show();
+    list.setCurrentToHead();
+    list.sortCurrentElement();
+    list.show();
 
     system("pause");
     return 0;
