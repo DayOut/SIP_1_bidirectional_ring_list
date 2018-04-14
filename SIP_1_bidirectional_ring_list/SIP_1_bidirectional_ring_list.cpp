@@ -30,6 +30,7 @@ public:
     ~List()
     {
         deleteAllElements();
+        head = current = NULL;
     }
 
     void show()
@@ -181,6 +182,10 @@ public:
 
     bool findElement(T value)
     {
+        if (!head)
+        {
+            return false;
+        }
         TElem<T> *cursor = head;
         do
         {
@@ -438,9 +443,6 @@ public:
             head->prev->next = current->next;
         }
 
-
-        // если элемент больше следующего - необходимо искать место текущему элементу во второй части списка
-        // иначе до этого места
         TElem< T > *tmp = head;
 
         while (current->inf > tmp->inf)
@@ -498,12 +500,12 @@ int main()
     List<int> list;
     if (!list)
     {
-        cout << "asd";
+        cout << "O_o \n";
     }
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 20000; i++)
     {
-        list.addToEnd(rand() % 100);
+        list.addToEnd(rand() % 1000000);
     }
 
     list.addToBegin(2);
@@ -523,8 +525,8 @@ int main()
     
     list.sort();
     unsigned int end = clock();
-    cout << "ВРемени на сортировку: " << end - start << " ms\n";
-    list.addSorted(9);
+    cout << "Времени на сортировку: " << end - start << " ms\n";
+    /*list.addSorted(9);
     list.addSorted(8);
     list.show();
     cout << endl;
@@ -557,10 +559,11 @@ int main()
     list.show();
     list.setCurrentToHead();
     list.sortCurrentElement();
+    --list;
     list.show();
     cout << endl;
     int a = list.getCopyInf();
-    cout << "\n" << a << endl;
+    cout << "\n" << a << endl;*/
 
     system("pause");
     return 0;
